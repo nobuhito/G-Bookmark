@@ -1,5 +1,5 @@
-var bookmark_folder_id;
-var min_id = '';
+var bookmark_folder_id = 0;
+var min_id = 0;
 
 chrome.extension.onConnect.addListener( function(port) {
     port.onMessage.addListener(function(msg) {
@@ -53,7 +53,7 @@ function load_bookmark(bookmark_folder, port) {
         roots.forEach(function(item) {
             bookmarks = processNode(item, bookmarks, min_id, bookmark_folder);
         });
-        if (bookmarks.length > 0) {
+        if (bookmarks.length > 0 && bookmark_folder_id > 0) {
             port.postMessage({action: 'load_bookmark', result: bookmarks});
         } else {
             chrome.bookmarks.create({"parentId": min_id,
@@ -64,18 +64,14 @@ function load_bookmark(bookmark_folder, port) {
 }
 
 function processNode(item, bookmarks, min_id, bookmark_folder) {
-    if (min_id == '' && min_id > item.id) {
-        min_id = item.id;
-    }
-    if (item.title == bookmark_folder) {
-        bookmark_folder_id = item.id;
-    }
+    min_id = (min_id == 0 || min_id > item.id)? item.id: min_id;
+    bookmark_folder_id = (item.title == bookmark_folder)? item.id: bookmark_folder_id;
+
     if (item.children) {
         item.children.forEach(function(child) {
             bookmarks = processNode(child, bookmarks, min_id, bookmark_folder);
         });
-    }
-    if (item.url && item.url.match(/^https\:\/\/plus\.google\.com\//)) {
+    } else if (item.url && item.url.match(/^https\:\/\/plus\.google\.com\//)) {
         bookmarks.push(item.url);
     }
     return bookmarks;

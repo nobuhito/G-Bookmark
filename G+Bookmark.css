@@ -1,0 +1,18 @@
+.gbookmark {
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 2px;
+	width: 15px;
+	height: 15px;
+	cursor: pointer;
+	background: url(https://mail.google.com/mail/?ui=2&view=dim&iv=jby7jc4gx732&it=ic) no-repeat 0px -20px;
+}
+.gbookmark.active {
+	background: url(https://mail.google.com/mail/?ui=2&view=dim&iv=jby7jc4gx732&it=ic) no-repeat -20px -20px;
+}
+.gbookmark.active:hover {
+	background: url(https://mail.google.com/mail/?ui=2&view=dim&iv=jby7jc4gx732&it=ic) no-repeat 0px -20px;
+}
+.gbookmark:hover {
+	background: url(https://mail.google.com/mail/?ui=2&view=dim&iv=jby7jc4gx732&it=ic) no-repeat -20px -20px;
+}

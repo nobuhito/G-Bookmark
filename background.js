@@ -47,29 +47,34 @@ function del_bookmark(url) {
 
 function load_bookmark(bookmark_folder, port) {
     var bookmarks = [];
-    var min_id;
+    bookmarks.push('http://example.com');
 
     chrome.bookmarks.getTree(function(roots) {
+
         roots.forEach(function(item) {
-            bookmarks = processNode(item, bookmarks, min_id, bookmark_folder);
+            bookmarks = processNode(item, bookmarks, bookmark_folder);
         });
-        if (bookmarks.length > 0 && bookmark_folder_id > 0) {
-            port.postMessage({action: 'load_bookmark', result: bookmarks});
-        } else {
+
+        if (bookmark_folder_id == 0) {
             chrome.bookmarks.create({"parentId": min_id,
                                      "index": 0,
-                                     "title": bookmark_folder});
+                                     "title": bookmark_folder
+                                    }, function(folder) {
+                                        bookmark_folder_id = folder.id;
+                                    });
         }
+
+        port.postMessage({action: 'load_bookmark', result: bookmarks});
     });
 }
 
-function processNode(item, bookmarks, min_id, bookmark_folder) {
+function processNode(item, bookmarks, bookmark_folder) {
     min_id = (min_id == 0 || min_id > item.id)? item.id: min_id;
     bookmark_folder_id = (item.title == bookmark_folder)? item.id: bookmark_folder_id;
 
     if (item.children) {
         item.children.forEach(function(child) {
-            bookmarks = processNode(child, bookmarks, min_id, bookmark_folder);
+            bookmarks = processNode(child, bookmarks, bookmark_folder);
         });
     } else if (item.url && item.url.match(/^https\:\/\/plus\.google\.com\//)) {
         bookmarks.push(item.url);
